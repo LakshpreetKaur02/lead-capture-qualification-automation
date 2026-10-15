@@ -1,0 +1,901 @@
+{
+  "name": "Lead Capture & Qualification Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-capture",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.2,
+      "position": [
+        -112,
+        -16
+      ],
+      "id": "75fd08b8-2aca-4219-af96-37309dd5840e",
+      "name": "📩 Receive Lead Submission",
+      "webhookId": "98bae814-a05f-46f1-9a82-ecdedd9651c0"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f578b016-fc75-43df-81d8-526e918cc534",
+              "name": "name",
+              "value": "={{ $json.body.name }}",
+              "type": "string"
+            },
+            {
+              "id": "dc0c3c4a-1854-4788-82bc-e53e259b48c9",
+              "name": "body.email",
+              "value": "={{ $json.body.email }}",
+              "type": "string"
+            },
+            {
+              "id": "5091d18c-0584-4e41-bf47-16d057a2624a",
+              "name": "body.phone",
+              "value": "={{ $json.body.phone }}",
+              "type": "string"
+            },
+            {
+              "id": "c12895ea-5467-4fcc-961c-0d03c5da1eaf",
+              "name": "body.company",
+              "value": "={{ $json.body.company }}",
+              "type": "string"
+            },
+            {
+              "id": "e5e908c5-3ef8-4762-b8fe-d6e09e8bb772",
+              "name": "body.budget",
+              "value": "={{ $json.body.budget }}",
+              "type": "number"
+            },
+            {
+              "id": "da43e395-51b0-4598-9773-98219de5b254",
+              "name": "body.source",
+              "value": "={{ $json.body.source }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        96,
+        -16
+      ],
+      "id": "4752829c-7495-4be0-b150-d0772911587f",
+      "name": "🧹 Clean & Map Lead Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "104d9fdb-fdcb-467d-8a4b-aa516fe37ff6",
+              "leftValue": "={{ $json.body.email }}",
+              "rightValue": "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        304,
+        -16
+      ],
+      "id": "e59ba4a8-d37b-4fa0-97ea-be32251c3f24",
+      "name": "✅ Validate Lead Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6fbd7807-8065-4706-938c-5bc628aaba51",
+              "leftValue": "={{ $json.body.budget }}",
+              "rightValue": 50000,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        592,
+        -224
+      ],
+      "id": "f7e27298-ab39-40d7-a1fd-0f13ab584396",
+      "name": "🔥 Check Hot Lead Criteria"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ebb43b37-47ac-4910-9fbb-81e7beaaeb31",
+              "leftValue": "={{ $('✅ Validate Lead Data').item.json.body.budget }}",
+              "rightValue": 10000,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        736,
+        48
+      ],
+      "id": "8b8e53ed-64b1-4fd8-8490-77107677c355",
+      "name": "🟡 Evaluate Warm Lead Criteria"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1c36a8ea-3c83-4dfb-934b-6515941c445c",
+              "name": "Category",
+              "value": "Hot",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        976,
+        -240
+      ],
+      "id": "2a60c74e-342a-4621-a1ee-2ff9d39120df",
+      "name": "🔥 Assign Hot Lead Category"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ed0d860b-4247-475c-a955-d5312f93e706",
+              "name": "Category",
+              "value": "Warm",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        976,
+        32
+      ],
+      "id": "e41e1333-ff70-4a7b-a32d-7fadafc04a93",
+      "name": "🟡 Assign Warm Lead Category"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ddcd0616-5de6-466a-b90f-15dd4f2f2847",
+              "name": "Category",
+              "value": "Cold",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        976,
+        272
+      ],
+      "id": "ee868889-5fa8-40bb-ba9c-b88a75c4c45e",
+      "name": "❄️ Assign Cold Lead Category — Budget"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0928e73d-8523-4cc1-bb11-1f0de4154501",
+              "name": "Category",
+              "value": "Cold",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        976,
+        496
+      ],
+      "id": "2d20d134-4388-435f-bed9-673ac741823a",
+      "name": "❄️ Assign Cold Lead Category — Invalid Email"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1FwedycaavOu2arfEjJZercBd-6LFnLuPVvkW1SBf5fs",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FwedycaavOu2arfEjJZercBd-6LFnLuPVvkW1SBf5fs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FwedycaavOu2arfEjJZercBd-6LFnLuPVvkW1SBf5fs/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.body.name }}",
+            "Email": "={{ $json.body.email }}",
+            "Phone": "={{ $json.body.phone }}",
+            "Company": "={{ $json.body.company }}",
+            "Budget": "={{ $json.body.budget }}",
+            "Source": "={{ $json.body.source }}",
+            "Timestamp": "={{ $now.toISO() }}",
+            "Lead Category": "={{ $json.Category }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Lead Category",
+              "displayName": "Lead Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1552,
+        -224
+      ],
+      "id": "3ece0d9b-f501-438a-98f3-3afa02239e0d",
+      "name": "📊 Log Lead in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kqo0H2wAswpAn2q3",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "lakshpreetkaur.34@gmail.com",
+        "subject": "=New Lead Captured — {{ $json.Name }}",
+        "message": "=<h2>New Lead Captured!</h2>\n<p><b>Name:</b> {{ $json.Name }}</p>\n<p><b>Email:</b> {{ $json.Email }}</p>\n<p><b>Company:</b> {{ $json.Company }}</p>\n<p><b>Budget:</b> ₹{{ $json.Budget }}</p>\n<p><b>Category:</b> {{ $json[\"Lead Category\"] }}</p>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1728,
+        -224
+      ],
+      "id": "692d6995-b429-4ff3-bdca-6e15924a89da",
+      "name": "📧 Send Lead Notification",
+      "webhookId": "3ff4c2bc-dfd3-4ef7-bc23-844347bc522e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "wHfeLHoHYMrZNyHu",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1FwedycaavOu2arfEjJZercBd-6LFnLuPVvkW1SBf5fs",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FwedycaavOu2arfEjJZercBd-6LFnLuPVvkW1SBf5fs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1435445204,
+          "mode": "list",
+          "cachedResultName": "Cold Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FwedycaavOu2arfEjJZercBd-6LFnLuPVvkW1SBf5fs/edit#gid=1435445204"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.body.name }}",
+            "Email": "={{ $json.body.email }}",
+            "Phone": "={{ $json.body.phone }}",
+            "Company": "={{ $json.body.company }}",
+            "Budget": "={{ $json.body.budget }}",
+            "Source": "={{ $json.body.source }}",
+            "Lead Category": "={{ $json.Category }}",
+            "Timestamp": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Category",
+              "displayName": "Lead Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1552,
+        416
+      ],
+      "id": "4b2378c3-5163-42be-9413-d70bb97f1fca",
+      "name": "🗄️ Archive Cold Leads to Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kqo0H2wAswpAn2q3",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1FwedycaavOu2arfEjJZercBd-6LFnLuPVvkW1SBf5fs",
+          "mode": "list",
+          "cachedResultName": "Lead Management",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FwedycaavOu2arfEjJZercBd-6LFnLuPVvkW1SBf5fs/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 114993582,
+          "mode": "list",
+          "cachedResultName": "Warm Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1FwedycaavOu2arfEjJZercBd-6LFnLuPVvkW1SBf5fs/edit#gid=114993582"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "={{ $json.body.name }}",
+            "Email": "={{ $json.body.email }}",
+            "Phone": "={{ $json.body.phone }}",
+            "Company": "={{ $json.body.company }}",
+            "Budget": "={{ $json.body.budget }}",
+            "Source": "={{ $json.body.source }}",
+            "Lead Category": "={{ $json.Category }}",
+            "Timestamp": "={{ $now.toISO() }}",
+            "Follow-up Status": "Pending"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Phone",
+              "displayName": "Phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead Category",
+              "displayName": "Lead Category",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Timestamp",
+              "displayName": "Timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Follow-up Status",
+              "displayName": "Follow-up Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1552,
+        32
+      ],
+      "id": "2618b3d3-1b3d-4ed8-a193-e2f85398643b",
+      "name": "🟡 Add Warm Leads to Follow-up Queue",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "kqo0H2wAswpAn2q3",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1328,
+        -256
+      ],
+      "id": "4b8af9f0-1131-4614-8a1f-fa4409f5a229",
+      "name": "Combine Qualified Leads"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1312,
+        416
+      ],
+      "id": "83516511-4301-4ddd-b5a0-c9f57575f400",
+      "name": "Combine Cold Leads for Archive"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "📩 Receive Lead Submission": {
+      "main": [
+        [
+          {
+            "node": "🧹 Clean & Map Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧹 Clean & Map Lead Data": {
+      "main": [
+        [
+          {
+            "node": "✅ Validate Lead Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "✅ Validate Lead Data": {
+      "main": [
+        [
+          {
+            "node": "🔥 Check Hot Lead Criteria",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "❄️ Assign Cold Lead Category — Invalid Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔥 Check Hot Lead Criteria": {
+      "main": [
+        [
+          {
+            "node": "🔥 Assign Hot Lead Category",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "🟡 Evaluate Warm Lead Criteria",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🟡 Evaluate Warm Lead Criteria": {
+      "main": [
+        [
+          {
+            "node": "🟡 Assign Warm Lead Category",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "❄️ Assign Cold Lead Category — Budget",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔥 Assign Hot Lead Category": {
+      "main": [
+        [
+          {
+            "node": "Combine Qualified Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🟡 Assign Warm Lead Category": {
+      "main": [
+        [
+          {
+            "node": "🟡 Add Warm Leads to Follow-up Queue",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Combine Qualified Leads",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "❄️ Assign Cold Lead Category — Budget": {
+      "main": [
+        [
+          {
+            "node": "Combine Cold Leads for Archive",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Combine Qualified Leads",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "❄️ Assign Cold Lead Category — Invalid Email": {
+      "main": [
+        [
+          {
+            "node": "Combine Cold Leads for Archive",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Combine Qualified Leads",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "📊 Log Lead in Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "📧 Send Lead Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📧 Send Lead Notification": {
+      "main": [
+        []
+      ]
+    },
+    "🗄️ Archive Cold Leads to Google Sheets": {
+      "main": [
+        []
+      ]
+    },
+    "Combine Qualified Leads": {
+      "main": [
+        [
+          {
+            "node": "📊 Log Lead in Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Combine Cold Leads for Archive": {
+      "main": [
+        [
+          {
+            "node": "🗄️ Archive Cold Leads to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "802dcdd8-dffb-4c45-aa7e-ff9524ffc709",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "995a62d25edca6b88fa4b8d8721817f138588ee2fb12c518a94f7eb2cb61f368"
+  },
+  "nodeGroups": [],
+  "id": "8biWOyKXFAIoLvgy",
+  "tags": []
+}
