@@ -73,12 +73,6 @@ Sends an email notification containing the lead's details and assigned category 
 5. Configure the webhook to receive the expected fields: `name`, `email`, `phone`, `company`, `budget`, and `source`.
 6. Test Hot, Warm, Cold, and invalid-email submissions before using the workflow.
 
-## 🔐 Security Notes
-
-- Do not upload API keys, passwords, access tokens, or other secrets.
-- Review the exported workflow JSON before publishing it.
-- Hide personal information and sensitive lead data in screenshots, especially if the repository is public.
-
 ---
 
 **Project:** Lead Capture & Qualification Automation  
